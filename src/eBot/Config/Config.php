@@ -449,12 +449,27 @@ class Config extends Singleton
         Logger::log("MySQL: " . $this->mysql_ip . ":" . $this->mysql_port . " " . $this->mysql_user . ":" . \str_repeat("*", \strlen($this->mysql_pass)) . "@" . $this->mysql_base);
         Logger::log("Socket: " . $this->bot_ip . ":" . $this->bot_port);
         Logger::log("Advertising by Season:");
-        for ($i = 0; $i < count($this->advertising['message']); $i++) {
-            Logger::log("-> " . $this->advertising['season_name'][$i] . ": " . $this->advertising['message'][$i]);
+        
+        // Добавляем проверку на существование и тип данных
+        if (isset($this->advertising['message']) && is_array($this->advertising['message'])) {
+            for ($i = 0; $i < count($this->advertising['message']); $i++) {
+                // Также проверяем существование элементов season_name
+                $seasonName = isset($this->advertising['season_name'][$i]) ? $this->advertising['season_name'][$i] : 'Unknown';
+                $message = isset($this->advertising['message'][$i]) ? $this->advertising['message'][$i] : '';
+                Logger::log("-> " . $seasonName . ": " . $message);
+            }
+        } else {
+            Logger::log("-> No advertising data available");
         }
+        
         Logger::log("Maps:");
-        foreach ($this->maps as $map) {
-            Logger::log("-> " . $map);
+        // Также добавляем проверку для maps
+        if (isset($this->maps) && is_array($this->maps)) {
+            foreach ($this->maps as $map) {
+                Logger::log("-> " . $map);
+            }
+        } else {
+            Logger::log("-> No maps data available");
         }
     }
 
