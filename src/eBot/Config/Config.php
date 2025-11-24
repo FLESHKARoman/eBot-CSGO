@@ -419,17 +419,29 @@ class Config extends Singleton
     public function scanAdvertising()
     {
         unset($this->advertising);
+        $this->advertising = [];
+        
         $q = \mysqli_query(Application::getInstance()->db, "SELECT a.`season_id`, a.`message`, s.`name` FROM `advertising` a LEFT JOIN `seasons` s ON a.`season_id` = s.`id` WHERE a.`active` = 1");
         while ($row = mysqli_fetch_array($q, MYSQLI_ASSOC)) {
-            $this->advertising['message'][] = $row['message'];
             if ($row['season_id'] == null) {
                 $row['season_id'] = 0;
                 $row['name'] = "General";
             }
-            $this->advertising['season_id'][] = intval($row['season_id']);
-            $this->advertising['season_name'][] = $row['name'];
+            $this->advertising[] = [
+                'season_id' => intval($row['season_id']),
+                'season_name' => $row['name'],
+                'message' => $row['message']
+            ];
         }
-        array_multisort($this->advertising['season_id'], SORT_ASC, $this->advertising['season_name'], $this->advertising['message']);
+        
+        if (!empty($this->advertising)) {
+            usort($this->advertising, function($a, $b) {
+                if ($a['season_id'] == $b['season_id']) {
+                    return strcmp($a['season_name'], $b['season_name']);
+                }
+                return $a['season_id'] - $b['season_id'];
+            });
+        }
     }
 
     public function printConfig()
