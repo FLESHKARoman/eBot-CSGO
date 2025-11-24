@@ -14,7 +14,8 @@ class ReportManager extends Singleton implements Taskable
 {
     public function __construct()
     {
-        TaskManager::getInstance()->addTask(new Task($this, "sendReport", microtime(true) + 10), true);
+        $persistent = true;
+        TaskManager::getInstance()->addTask(new Task($this, "sendReport", microtime(true) + 10), $persistent);
     }
 
     public function taskExecute($name)
